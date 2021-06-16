@@ -33,7 +33,7 @@ const Header = () => {
     const user = useSelector(selectUser);
     const dispatch = useDispatch();
     const logOutHandler = async () => {
-        const response = await axios.get('http://localhost:4000/user/logout',{
+        const response = await axios.get('/user/logout',{
             withCredentials: true,
             responseType: "json"
         });

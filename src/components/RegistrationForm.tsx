@@ -85,7 +85,7 @@ export default function RegistrationForm() {
     });
 
     const submitHandler = async (dataUser: FormikValues, actions:  FormikHelpers<any>) => {
-        const response = await axios.post("http://localhost:4000/user/registration",dataUser, {
+        const response = await axios.post("/user/registration",dataUser, {
             withCredentials: true,
         });
 

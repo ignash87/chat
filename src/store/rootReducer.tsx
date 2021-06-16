@@ -105,7 +105,7 @@ function actionLoginUser(value: UserLoginResponseType) {
 export function loginUser (dataUser: UserLoginRequestType){
     return async (dispatch: AppDispatch)=>{
         try {
-            const response = await axios.post('http://localhost:4000/user/login', dataUser, {
+            const response = await axios.post('/user/login', dataUser, {
                 withCredentials: true,
                 responseType: "json"
             });
@@ -122,7 +122,7 @@ export function loginUser (dataUser: UserLoginRequestType){
 export function getInitialUser(){
     return async (dispatch: AppDispatch)=>{
         try {
-            const response = await axios.get('http://localhost:4000/user/userAuth',{
+            const response = await axios.get('/user/userAuth',{
                 withCredentials: true,
                 responseType: "json"
             });
