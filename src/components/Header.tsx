@@ -3,11 +3,10 @@ import styled from "@emotion/styled";
 import {Link, NavLink } from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {selectUser} from "../store/store";
-import axios from "axios";
 import {actionLogoutUser} from "../store/rootReducer";
+import api from "../http";
 
 const Sign = styled.div`
-   
     span {
         padding-right: 25px;
     }
@@ -28,17 +27,15 @@ const HeaderWrapper = styled.div`
     margin-bottom: 15px;
 `;
 
-
 const Header = () => {
     const user = useSelector(selectUser);
     const dispatch = useDispatch();
+
     const logOutHandler = async () => {
-        const response = await axios.get('/user/logout',{
-            withCredentials: true,
-            responseType: "json"
-        });
+        const response = await api.get('/user/logout');
         const data = await response.data;
         console.log(data)
+        localStorage.removeItem('token');
         dispatch(actionLogoutUser());
     };
     return (
@@ -78,7 +75,6 @@ const Header = () => {
                 }
             </Sign>
         </HeaderWrapper>
-
     );
 };
 

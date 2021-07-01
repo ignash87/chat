@@ -1,11 +1,11 @@
 import React, {useEffect, useRef, useState} from 'react';
-import Messages from "./Messages";
 import AddMessageForm from "./AddMessagForm";
 import io, {Socket} from 'socket.io-client'
 import {ChatMessageType, UserInChat} from "../types";
 import {useSelector} from "react-redux";
 import {selectUser} from "../store/store";
 import {BASE_API_URL} from "../constants"
+import MessagesBlock from "./MessagesBlock";
 
 const SERVER_URL = BASE_API_URL;
 
@@ -32,14 +32,20 @@ const Chat: React.FC = () => {
         socketRef.current = io(SERVER_URL);
 
         socketRef.current.emit('user:add', user?.id);
+        socketRef.current.emit('get messages', user?.id);
 
         socketRef.current.on('users_In_Chat', (users: UserInChat[]) => {
             setUserInChat(users.filter(userChat =>userChat.id!==user?.id))
         });
 
-        socketRef.current.on("message", (data: ChatMessageType)=>{
+        socketRef.current.on("download:messages", (data: ChatMessageType[])=>{
+            setMessages(data);
+        });
+
+        socketRef.current.on("add:message", (data: ChatMessageType)=>{
             setMessages((prevMessages) => [...prevMessages, data])
         });
+
 
         return () => {
             socketRef.current?.emit('user:leave', user?.id);
@@ -47,27 +53,9 @@ const Chat: React.FC = () => {
         }
     }, [user])
 
-
-    const handleBeforeunload = (e: any) => {
-        console.log(123456789)
-        socketRef.current?.emit('user:leave', user?.id);
-
-    }
-    useEffect(() => {
-
-        window.addEventListener('beforeunload', handleBeforeunload)
-        return () => {
-            window.removeEventListener('beforeunload', handleBeforeunload)
-        }
-        // eslint-disable-next-line
-    }, []);
-
     return (
         <div>
-            <ul>
-                {userInChat.map(u=><li key={u.id} style={u.isWrites ? {color: 'red'} : {color: 'black'}}>{u.userName} </li>)}
-            </ul>
-            <Messages messages={messages}/>
+            <MessagesBlock userInChat={userInChat} messages={messages}/>
             <AddMessageForm addNewMessage={addNewMessage} changeUserIsWrites={changeUserIsWrites} />
         </div>
     );

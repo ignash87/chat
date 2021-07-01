@@ -1,7 +1,7 @@
 import { combineReducers } from "redux";
 import { ChatMessageType } from "../types";
-import {AppDispatch, RootState} from "./store";
-import axios from "axios";
+import { AppDispatch } from "./store";
+import api from "../http";
 
 const USER_LOGOUT = 'USER_LOGOUT',
     USER_LOGIN = 'USER_LOGIN',
@@ -103,17 +103,17 @@ function actionLoginUser(value: UserLoginResponseType) {
 }
 
 export function loginUser (dataUser: UserLoginRequestType){
-    return async (dispatch: AppDispatch)=>{
+    return async (dispatch: AppDispatch) => {
         try {
-            const response = await axios.post('/user/login', dataUser, {
-                withCredentials: true,
-                responseType: "json"
-            });
+            const response = await api.post('/user/login', dataUser);
             const status = response.status;
-            const {user} = await response.data;
+            const {user, token} = await response.data;
+
+            localStorage.setItem('token', token);
             if( status === 200 ) return dispatch(actionLoginUser(user));
         } catch(err) {
             dispatch(actionErrorLogin(err.response.data.message))
+
             console.log(err)
         }
     }
@@ -122,12 +122,11 @@ export function loginUser (dataUser: UserLoginRequestType){
 export function getInitialUser(){
     return async (dispatch: AppDispatch)=>{
         try {
-            const response = await axios.get('/user/userAuth',{
-                withCredentials: true,
-                responseType: "json"
-            });
-            const {user} = await response.data;
-            dispatch(actionLoginUser(user));
+            if(localStorage.getItem('token')){
+                const response = await api.get('/user/userAuth');
+                const { user } = await response.data;
+                dispatch(actionLoginUser(user));
+            }
         } catch (err){
             console.log(err)
         }
@@ -140,13 +139,5 @@ export function actionLogoutUser() {
         type: USER_LOGOUT
     };
 }
-
-function actionAddMessage(value: ActionTypeMessage) {
-    return {
-        type: MESSAGE_ADD,
-        payload: value,
-    };
-}
-
 
 export default rootReducer;

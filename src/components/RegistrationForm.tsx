@@ -1,11 +1,11 @@
 import React from "react";
-
 import {Field, Form, Formik, FormikHelpers, FormikValues} from "formik";
 import * as Yup from "yup";
-import axios from "axios";
 import styled from '@emotion/styled'
 import FormInputField from "./FormInputField";
 import {useHistory} from "react-router";
+import api from "../http";
+import {AxiosResponse} from "axios";
 
 const Button = styled.button`
     align-content: center;
@@ -68,7 +68,7 @@ const FormWrapper = styled.section`
  
 `;
 
-export default function RegistrationForm() {
+const RegistrationForm: React.FC = () => {
     const history = useHistory();
 
     const registrationSchema = Yup.object({
@@ -85,16 +85,13 @@ export default function RegistrationForm() {
     });
 
     const submitHandler = async (dataUser: FormikValues, actions:  FormikHelpers<any>) => {
-        const response = await axios.post("/user/registration",dataUser, {
-            withCredentials: true,
-        });
-
-        const status = response.status;
+        const response: AxiosResponse<FormikValues> = await api.post("/user/registration", dataUser);
+        const status: number = response.status;
 
         if (status === 201) {
             history.push("/login");
         } else {
-            const data = await response.data;
+            const data: FormikValues = await response.data;
             actions.setFieldError("login", data.message);
         }
     };
@@ -143,3 +140,4 @@ export default function RegistrationForm() {
         </FormWrapper>
     );
 }
+export default RegistrationForm;

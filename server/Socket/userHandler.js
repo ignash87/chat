@@ -1,29 +1,28 @@
-const UsersInChat = require('../Schemas/userInChat');
-const UserChat = require('../Schemas/user');
- const userHandler = (io, socket)=> {
+const UsersInChat = require('../schemas/userInChat');
+const UserChat = require('../schemas/user');
 
-    const getUsers = async () => {
-        let usersInChat = await UsersInChat.find({});
+const getUsers = async (io) => {
+    let usersInChat = await UsersInChat.find({});
 
-        const usersPromise = usersInChat.map((user) => UserChat.find({_id: user.userId}));
-        let usersData = await Promise.all(usersPromise);
+    const usersPromise = usersInChat.map((user) => UserChat.find({_id: user.userId}));
+    let usersData = await Promise.all(usersPromise);
 
-        const responseData = usersInChat.reduce((acc, data)=>{
-            const dataNew = usersData.find(item=> {
-                return item[0]._id.equals(data.userId)
-            });
-            const responseUser = {
-                userName: `${dataNew[0].lastName} ${dataNew[0].firstName}`,
-                id: data.userId,
-                isWrites: data.isWrites}
-            dataNew && acc.push(responseUser)
-            return acc
-        }, [])
+    const responseData = usersInChat.reduce((acc, data)=>{
+        const dataNew = usersData.find(item=> {
+            return item[0]._id.equals(data.userId);
+        });
+        const responseUser = {
+            userName: `${dataNew[0].lastName} ${dataNew[0].firstName}`,
+            id: data.userId,
+            isWrites: data.isWrites}
+        dataNew && acc.push(responseUser)
+        return acc;
+    }, [])
 
-        io.sockets.emit('users_In_Chat', responseData)
-    };
+    io.sockets.emit('users_In_Chat', responseData);
+};
 
-
+module.exports.userHandler = (io, socket)=> {
     const addUser = async (userId) => {
         let user = await UsersInChat.find({userId});
         if (!user.length){
@@ -31,32 +30,22 @@ const UserChat = require('../Schemas/user');
             const newUser = await new UsersInChat(userData);
             await newUser.save();
         }
-        await getUsers();
+        await getUsers(io);
     };
 
     const leaveUser = async (userId) => {
-        console.log(123456)
-        await UsersInChat.deleteOne({userId})
-        await getUsers();
+        await UsersInChat.deleteOne({userId});
+        await getUsers(io);
     };
-     const leaveBySocketUser = async (socketId) => {
-         await UsersInChat.deleteOne({socketId})
-         console.log('leaveBySocketUser')
-         await getUsers();
-     };
 
     const changeIsWritesUser = async ({userId, value}) => {
-
         await UsersInChat.updateOne({userId}, {isWrites: value});
-        console.log('changeIsWritesUser')
-        await getUsers();
+        await getUsers(io);
     };
 
-    socket.on('user:get', getUsers);
     socket.on('user:add', addUser);
     socket.on('user:leave', leaveUser);
-    socket.on('user:leaveBySocket', leaveBySocketUser);
     socket.on('user:changeIsWrites', changeIsWritesUser);
 }
 
-module.exports = userHandler
+module.exports.getUsers = getUsers;
