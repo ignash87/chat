@@ -24,7 +24,6 @@ const HeaderWrapper = styled.div`
     display: flex;
     justify-content: space-between;
     padding: 30px;
-    margin-bottom: 15px;
 `;
 
 const Header = () => {

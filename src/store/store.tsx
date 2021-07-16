@@ -9,6 +9,8 @@ export type RootState = ReturnType<typeof store.getState>
 export type AppDispatch = typeof store.dispatch;
 
 export const selectUser = (state: RootState)=>state.user;
+export const selectIsLoading = (state: RootState)=>state.isLoading;
+
 export const selectErrorLogin = (state: RootState)=>state.error?.login;
 
 export default store;

@@ -10,15 +10,19 @@ import RegistrationForm from "./RegistrationForm";
 import Chat from "./Chat";
 import Header from "./Header";
 import {useSelector} from "react-redux";
-import {selectUser} from "../store/store";
+import {selectIsLoading, selectUser} from "../store/store";
+import Loader from "./Loader";
 
 function RouterApp() {
     const user = useSelector(selectUser)
+    const isLoading = useSelector(selectIsLoading)
     return (
         <Router>
             <Header />
             <Switch>
-                <Route exact path="/" component={user ? Chat : Login} />
+                <Route exact path="/" >
+                    {isLoading ? <Loader/> : (user ? <Chat/> : <Redirect to="/login"/>)}
+                </Route>
                 <Route path="/login" component={Login} />
                 <Route path="/registration" component={RegistrationForm} />
             </Switch>

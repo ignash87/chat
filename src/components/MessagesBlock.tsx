@@ -10,8 +10,8 @@ const MessageWrapper = styled.div`
     & ul{
         width: 20%;
         min-width: 150px;
-        border-right: solid 1px;
         list-style: none;
+        padding-top: 20px
     }
     & .messages{
         overflow: auto;
@@ -21,8 +21,8 @@ const MessageWrapper = styled.div`
 const MessagesBlock: React.FC<{ userInChat: UserInChat[], messages: ChatMessageType[] }> = ({ userInChat, messages}) => {
     return (
         <MessageWrapper>
-            <UsersInChat userInChat={userInChat} />
             <Messages messages={messages}/>
+            <UsersInChat userInChat={userInChat} />
         </MessageWrapper>
     );
 }

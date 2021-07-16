@@ -25,6 +25,7 @@ const io = require('socket.io')(server, {
 
 const buildPath = path.join(__dirname, '..', 'build');
 app.use(express.static(buildPath));
+app.use('*', express.static(buildPath));
 
 app.use(cors({ credentials: true, origin: '' }));
 app.use(express.json());

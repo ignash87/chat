@@ -1,7 +1,20 @@
 import React, {useRef, useState} from 'react';
 import {Button, Input} from 'antd';
+import styled from "@emotion/styled";
 
-const { TextArea } = Input;
+const TextArea = styled.textarea`
+    width: 100%;
+    resize: none;
+    padding: 10px;
+    border-radius: 5px;
+    outline: none;
+
+}
+`;
+const AddMessageWrapper = styled.div`
+    padding: 10px 20px;
+    width: 100%;
+`;
 
 type AddMessageFormProps = {
     addNewMessage: (value:string)=>void
@@ -16,15 +29,29 @@ const AddMessageForm: React.FC<AddMessageFormProps> = ({ addNewMessage, changeUs
         event.target.value="";
     };
     const handlerSubmit = ()=>{
-        addNewMessage(value);
-        setValue('');
+        if(value){
+            addNewMessage(value);
+            setValue('');
+        }
     }
+    const handlerEnterPress = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if(event.which == 13 && event.shiftKey == false) {
+            event.preventDefault();
+            handlerSubmit();
+        }
+    };
 
     return (
-        <div>
-            <TextArea onBlur={()=> {changeUserIsWrites(false)}} onFocus={()=>{changeUserIsWrites(true)}} rows={4} onChange={handlerChange} value={value}  />
+        <AddMessageWrapper>
+            <TextArea
+                onBlur={() => {changeUserIsWrites(false)}}
+                onFocus={()=>{changeUserIsWrites(true)}}
+                onChange={handlerChange}
+                onKeyPress={handlerEnterPress}
+                rows={4}
+                value={value}  />
             <Button onClick={handlerSubmit}>Send</Button>
-        </div>
+        </AddMessageWrapper>
     );
 };
 
